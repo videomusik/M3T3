@@ -1,0 +1,36 @@
+Partlist exported from /Users/videomusik/Dropbox/Physical Computing/Eagle/Teensy3 based M&M board/Teensy3 based M&M board V2.sch at 9/12/13 2:21 PM
+
+Part  Value                Device               Package              Description                                                  
+AUDIO PG203J               PG203J               PG203J               MIC/HEADPHONE JACK                                           
+C1    100n                 C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                   
+C2    100n                 C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                   
+C3    2u2                  CPOL-EUE2-5          E2-5                 POLARIZED CAPACITOR, European symbol                         
+C4    2u2                  CPOL-EUE2-5          E2-5                 POLARIZED CAPACITOR, European symbol                         
+C5    33n                  C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                   
+C6    330u                 CPOL-EUE2.5-7        E2,5-7               POLARIZED CAPACITOR, European symbol                         
+C7    47n                  C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                   
+C8    10uF                 CPOL-EUE2-5          E2-5                 POLARIZED CAPACITOR, European symbol                         
+C9    100n                 C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                   
+D1    1N4148DO35-10        1N4148DO35-10        DO35-10              DIODE                                                        
+D6                         2,15/1,0             2,15/1,0             THROUGH-HOLE PAD                                             
+IC1   MCP4921              MCP4921P             DIL8                 MCP4921: 12-bit DAC                                          
+IC2   SN754410PDIP         SN754410PDIP         DIL16                                                                             
+IC3   7805TV               7805TV               TO220V               Positive VOLTAGE REGULATOR                                   
+J1    DCJ0202              DCJ0202              DCJ0202              DC POWER JACK                                                
+LED1  TLLR4400             TLLR4400             LED3MM               Low Current (2mA) LED 3 mm Tinted Diffused Package color RED 
+R1                         TRIM_EU-CA9V         CA9V                 POTENTIOMETER                                                
+R2    330K                 R-EU_0207/10         0207/10              RESISTOR, European symbol                                    
+R3    10K                  R-EU_0207/10         0207/10              RESISTOR, European symbol                                    
+R4    10                   R-EU_0207/10         0207/10              RESISTOR, European symbol                                    
+R5    120                  R-EU_0207/10         0207/10              RESISTOR, European symbol                                    
+R6    10K                  R-EU_0207/10         0207/10              RESISTOR, European symbol                                    
+R7    10K                  R-EU_0207/10         0207/10              RESISTOR, European symbol                                    
+RX                         2,15/1,0             2,15/1,0             THROUGH-HOLE PAD                                             
+S1                         EG1218               GF-126-0159                                                                       
+SJ1                        SJ                   SJ                   SMD solder JUMPER                                            
+SV1                        ML6                  ML6                  HARTING                                                      
+SV2                        ML6                  ML6                  HARTING                                                      
+TX                         2,15/1,0             2,15/1,0             THROUGH-HOLE PAD                                             
+U$2   LM386                LM386OA              LM386                                                                             
+U$3   TEENSY_3.0_BAREBONES TEENSY_3.0_BAREBONES TEENSY_3.0_BAREBONES                                                              
+X2    TSW-114-02-S-S       TSW-114-02-S-S       TSW-114-02-S-S       THROUGH-HOLE .025" SQ POST HEADER                            
