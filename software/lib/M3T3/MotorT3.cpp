@@ -30,10 +30,10 @@
 
 #define ENABLE_12 2
 #define INPUT_1 3
-#define INPUT_2 4
+#define INPUT_2 5
 #define ENABLE_34 7
 #define INPUT_3 6
-#define INPUT_4 5
+#define INPUT_4 4
 
 bool reg_init = false;
 

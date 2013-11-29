@@ -48,6 +48,9 @@
 #define DAC_GA 5
 #define DAC_SHDN 4
 
+// Output pin for cutoff filter on Monotron
+#define CUTOFF_PIN 3
+
 // SPI pins
 #define DAC_CS 10  // Digital 10
 
@@ -218,6 +221,10 @@ public:
 	uint32_t uint_filter(uint32_t input);
 	void setCutoff(float frequency);
 	void setResonance(float resonance);
+	
+	// MONOTRON FILTER MOD
+	void monotronFilter();
+
 		
 	// FREQUENCY AND DETUNE FUNCTIONS
 	void setFrequency(float frequency);
@@ -294,7 +301,7 @@ public:
 	void setEnv2Release(uint8_t rel); // 0 - 127             
 	void setEnv2VelSustain(uint8_t vel); // 0 - 127
 	void setEnv2VelPeak(uint8_t vel); // 0 - 127
-	
+		
 	bool osc1LFO;
 	bool osc2LFO;
 	bool osc3LFO;
@@ -494,6 +501,8 @@ void synth_isr(void) {
 	if(Music.is12bit) Music.synthInterrupt12bitSineFM();
 	else Music.synthInterrupt8bitFM();
 	
+	Music.monotronFilter();
+	
 	Music.amplifier();
 	//Music.sample = (env1 * sample) >> 16;
 
@@ -620,7 +629,8 @@ void MMusic::synthInterrupt8bitFM ()
 	
 	dPhase1 = dPhase1 + (period1 - dPhase1) / portamento;
 //	modulator1 = (fmAmount1 * fmOctaves1 * (oscil3-15384))>>5;
-	modulator1 = (fmAmount1 * fmOctaves1 * (*osc1modSource_ptr))>>6;
+	modulator1 = (fmAmount1 * fmOctaves1 * (*osc1modSource_ptr))>>10;
+//	modulator1 = (fmAmount1 * (*osc1modSource_ptr))>>10;
 	modulator1 = (modulator1 * (*osc1modShape_ptr))>>16;
 	modulator1 = (modulator1 * int64_t(dPhase1))>>16;
 	modulator1 = (modulator1>>((modulator1>>31)&zeroFM));
@@ -632,7 +642,8 @@ void MMusic::synthInterrupt8bitFM ()
 	sample = (oscil1 * gain1);
 	
 	dPhase2 = dPhase2 + (period2 - dPhase2) / portamento;
-	modulator2 = (fmAmount2 * fmOctaves2 * (*osc2modSource_ptr))>>6;
+	modulator2 = (fmAmount2 * fmOctaves2 * (*osc2modSource_ptr))>>10;
+//	modulator2 = (fmAmount2 * (*osc2modSource_ptr))>>10;
 	modulator2 = (modulator2 * (*osc2modShape_ptr))>>16;
 	modulator2 = (modulator2 * int64_t(dPhase2))>>16;
 	modulator2 = (modulator2>>((modulator2>>31)&zeroFM));
@@ -644,7 +655,8 @@ void MMusic::synthInterrupt8bitFM ()
 	sample += (oscil2 * gain2);
 
 	dPhase3 = dPhase3 + (period3 - dPhase3) / portamento;
-	modulator3 = (fmAmount3 * fmOctaves3 * (*osc3modSource_ptr))>>6;
+	modulator3 = (fmAmount3 * fmOctaves3 * (*osc3modSource_ptr))>>10;
+//	modulator3 = (fmAmount3 * (*osc3modSource_ptr))>>10;
 	modulator3 = (modulator3 * (*osc3modShape_ptr))>>16;
 	modulator3 = (modulator3 * int64_t(dPhase3))>>16;
 	modulator3 = (modulator3>>((modulator3>>31)&zeroFM));
@@ -700,7 +712,8 @@ void MMusic::synthInterrupt12bitSineFM()
 	
 	dPhase1 = dPhase1 + (period1 - dPhase1) / portamento;
 //	modulator1 = (fmAmount1 * fmOctaves1 * (oscil3-32768))>>6;
-	modulator1 = (fmAmount1 * fmOctaves1 * (*osc1modSource_ptr))>>6;
+	modulator1 = (fmAmount1 * fmOctaves1 * (*osc1modSource_ptr))>>10;
+//	modulator1 = (fmAmount1 * (*osc1modSource_ptr))>>10;
 	modulator1 = (modulator1 * (*osc1modShape_ptr))>>16;
 	modulator1 = (modulator1 * int64_t(dPhase1))>>16;
 	modulator1 = (modulator1>>((modulator1>>31)&zeroFM));
@@ -714,7 +727,8 @@ void MMusic::synthInterrupt12bitSineFM()
 	
 	dPhase2 = dPhase2 + (period2 - dPhase2) / portamento;
 //	modulator2 = (fmAmount2 * fmOctaves2 * (oscil1-32768))>>6;
-	modulator2 = (fmAmount2 * fmOctaves2 * (*osc2modSource_ptr))>>6;
+	modulator2 = (fmAmount2 * fmOctaves2 * (*osc2modSource_ptr))>>10;
+//	modulator2 = (fmAmount2 * (*osc2modSource_ptr))>>10;
 	modulator2 = (modulator2 * (*osc2modShape_ptr))>>16;
 	modulator2 = (modulator2 * int64_t(dPhase2))>>16;
 	modulator2 = (modulator2>>((modulator2>>31)&zeroFM));
@@ -728,7 +742,8 @@ void MMusic::synthInterrupt12bitSineFM()
 	
 	dPhase3 = dPhase3 + (period3 - dPhase3) / portamento;
 //	modulator3 = (fmAmount3 * fmOctaves3 * (oscil2-32768))>>6;
-	modulator3 = (fmAmount3 * fmOctaves3 * (*osc3modSource_ptr))>>6;
+	modulator3 = (fmAmount3 * fmOctaves3 * (*osc3modSource_ptr))>>10;
+//	modulator3 = (fmAmount3 * (*osc3modSource_ptr))>>10;
 	modulator3 = (modulator3 * (*osc3modShape_ptr))>>16;
 	modulator3 = (modulator3 * int64_t(dPhase3))>>16;
 	modulator3 = (modulator3>>((modulator3>>31)&zeroFM));
@@ -853,6 +868,12 @@ void MMusic::envelope2() {
 		env2 = 65535;
 	}
 
+}
+
+
+void MMusic::monotronFilter() {
+	uint32_t cutoffValue = env2 >> 6;
+	analogWrite(CUTOFF_PIN, cutoffValue);
 }
 
 
@@ -1019,7 +1040,7 @@ void MMusic::init()
 	setFM1(0);
 	setFM2(0);
 	setFM3(0);
-	setFMoctaves(1);
+	setFMoctaves(0);
 	
 	// filter setup
 	setCutoff(20000.0);
@@ -1042,6 +1063,10 @@ void MMusic::init()
 	
 	spi_setup();
 	cli();
+	// set PWM for pin that goes to the monotron's cutoff
+	analogWriteFrequency(CUTOFF_PIN, 44100);
+	analogWriteResolution(10);
+	
 	synthTimer.begin(synth_isr, 1000000.0 / sampleRate);
 //	timer_setup();
 	sei();
@@ -1205,17 +1230,37 @@ void MMusic::setFM1(uint8_t fm) {
 
 void MMusic::setFM2(uint8_t fm) {
 	fmAmount2 = fm;
+//	fmAmount2 = (fm * fmOctaves2);
 }
 
 
 void MMusic::setFM3(uint8_t fm) {
 	fmAmount3 = fm;
+//	fmAmount3 = (fm * fmOctaves3);
 }
 
 
 void MMusic::setFMoctaves(uint8_t octs) {
+//	fmAmount1 = (fmAmount1 * octs);
+//	fmAmount2 = (fmAmount2 * octs);
+//	fmAmount3 = (fmAmount3 * octs);
 	fmOctaves1 = octs;
 	fmOctaves2 = octs;
+	fmOctaves3 = octs;
+}
+
+
+void MMusic::setFM1octaves(uint8_t octs) {
+	fmOctaves1 = octs;
+}
+
+
+void MMusic::setFM2octaves(uint8_t octs) {
+	fmOctaves2 = octs;
+}
+
+
+void MMusic::setFM3octaves(uint8_t octs) {
 	fmOctaves3 = octs;
 }
 
@@ -1334,21 +1379,6 @@ void MMusic::setFM3Shape(uint8_t shape) {
 			osc3modShape_ptr = &fullSignal;
 			break;
 	}
-}
-
-
-void MMusic::setFM1octaves(uint8_t octs) {
-	fmOctaves1 = octs;
-}
-
-
-void MMusic::setFM2octaves(uint8_t octs) {
-	fmOctaves2 = octs;
-}
-
-
-void MMusic::setFM3octaves(uint8_t octs) {
-	fmOctaves3 = octs;
 }
 
 
@@ -1782,7 +1812,7 @@ void inline MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 			else Music.fmToZeroHertz(true);
 			break;
 		case FM_OCTAVES:
-			Music.setFMoctaves(value/32+1);
+			Music.setFMoctaves(value+1);
 			break;
 		case LFO1:
 			Music.setOsc1LFO(value/64);
@@ -1879,13 +1909,13 @@ void inline MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 			Music.setFM3(value);
 			break;
 		case FM1_OCTAVES:
-			Music.setFM1octaves(value/32+1);
+			Music.setFM1octaves(value+1);
 			break;
 		case FM2_OCTAVES:
-			Music.setFM2octaves(value/32+1);
+			Music.setFM2octaves(value+1);
 			break;
 		case FM3_OCTAVES:
-			Music.setFM3octaves(value/32+1);
+			Music.setFM3octaves(value+1);
 			break;
 		case FM1_SOURCE:
 			Music.setFM1Source(value/32);
