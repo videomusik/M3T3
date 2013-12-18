@@ -54,31 +54,13 @@
 // SPI pins
 #define DAC_CS 10  // Digital 10
 
-// current sample rate is 40000 defined in the setup() section
-#define SAMPLE_RATE 22050
-#define CPU_FREQ 48 // in MHz
+#define SAMPLE_RATE 20000
+#define CPU_FREQ 96 // in MHz
 #define PERIOD_MAX BIT_32
 
 // Specify highest and lowest pitch in Hz
 #define LOW_PITCH 55
 #define HIGH_PITCH 1000
-
-// Checking if NUM_OSCILLATORS is set, and if not, default to 1 oscillator
-#ifndef NUM_OSCILLATORS
-	#define NUM_OSCILLATORS 1
-#elif (NUM_OSCILLATORS == 1)||(NUM_OSCILLATORS == 2)||(NUM_OSCILLATORS == 3)
-#else
-	#error NUM_OSCILLATORS shall be 1, 2 or 3
-#endif
-
-// Checking if BIT_DEPTH is set, and if not, default to 8bit
-#ifndef BIT_DEPTH
-	#define BIT_DEPTH 8
-#elif (BIT_DEPTH == 8)||(BIT_DEPTH == 12)
-#else
-	#error BIT_DEPTH shall be 8 or 12
-#endif
-
 
 // Shortnames for waveforms
 #define SINE 0
@@ -102,9 +84,6 @@
 #define MAX_ENV_GAIN 65535
 #define MIN_ENV_GAIN -65535
 
-
-
-
 // MIDI specific constants
 #ifndef MIDI_CHANNEL
 	#define MIDI_CHANNEL 1
@@ -115,7 +94,7 @@
 
 //synth parameters as MIDI controller numbers
 #define IS_12_BIT 3
-#define WAVEFORM 4
+#define CUTOFF 4
 #define ZERO_HZ_FM 5
 #define FM_OCTAVES 6
 #define AMP_ENV 7
@@ -214,13 +193,13 @@ public:
 	void envelope1();
 	void envelope2();
 	void amplifier();
-	void sendSampleToDAC();
+	void sendToDAC(); // sending both sound and cutoff
+	void sendSampleToDAC(); // sending only sound
 	
 	// FILTER FUNCTIONS
-	float filter(float input);
-	uint32_t uint_filter(uint32_t input);
-	void setCutoff(float frequency);
-	void setResonance(float resonance);
+	void filter();
+	void setCutoff(int32_t c);
+	void setResonance(int32_t res);
 	
 	// MONOTRON FILTER MOD
 	void monotronFilter();
@@ -384,21 +363,8 @@ private:
 	int32_t gain3;
 	
 	// FILTER VARIABLES
-	float cutoff;
-	float f;
-	float fb;
-	float fc;
-	float ftemp;
-	int32_t fuint;
-	float res;
-	int32_t in1;
-	int32_t in2;
-	int32_t in3;
-	int32_t in4;
-	int32_t out1;
-	int32_t out2;
-	int32_t out3;
-	int32_t out4;
+	int32_t cutoff;
+	int32_t resonance;
 	
 	// ENVELOPE VARIABLES
 	bool envelopeOn1;
@@ -494,27 +460,19 @@ extern MMidi Midi;
 void synth_isr(void) {
 	
 	Music.sendSampleToDAC();
+//	Music.sendToDAC();
 	
 	Music.envelope1();
 	Music.envelope2();
 	
 	if(Music.is12bit) Music.synthInterrupt12bitSineFM();
 	else Music.synthInterrupt8bitFM();
-	
-	Music.monotronFilter();
-	
+		
 	Music.amplifier();
-	//Music.sample = (env1 * sample) >> 16;
 
-	//Music.synthInterrupt();
+	//	Music.monotronFilter();
+	Music.filter();
 
-/*	
-	if(Music.is12bit) {
-		Music.synthInterrupt12bitSineFM();
-	} else {
-		Music.synthInterrupt8bitFM();
-	}
-*/	
 
 
 }
@@ -523,96 +481,7 @@ void synth_isr(void) {
 void MMusic::set12bit(bool b) {
 	is12bit = b;
 }
-
-
-void MMusic::setCutoff(float frequency) {
-	fc = frequency/65536.0;
-	f = fc * 1.16;
-	fb = res * (1.0 - 0.15 * f * f);
-	ftemp = 0.35013 * (f*f)*(f*f);
-
-	fuint = int32_t(f * 65536); 
-}
-
-
-void MMusic::setResonance(float resonance) {
-	res = resonance;
-	fb = res * (1.0 - 0.15 * f * f);	
-}
 	
-/*
-float MMusic::filter(float input)
-{
-//	f = fc * 1.16;
-//	fb = res * (1.0 - 0.15 * f * f);
-	input -= out4 * fb;
-//	input *= 0.35013 * (f*f)*(f*f);
-	input *= ftemp;
-	out1 = input + 0.3 * in1 + (1 - f) * out1; // Pole 1
-	in1  = input;
-	out2 = out1 + 0.3 * in2 + (1 - f) * out2;  // Pole 2
-	in2  = out1;
-	out3 = out2 + 0.3 * in3 + (1 - f) * out3;  // Pole 3
-	in3  = out2;
-	out4 = out3 + 0.3 * in4 + (1 - f) * out4;  // Pole 4
-	in4  = out3;
-	return out4;
-}
-*/
-
-uint32_t MMusic::uint_filter(uint32_t input)
-{
-	int bit_shift = 16;
-	//	f = fc * 1.16;
-	//	fb = res * (1.0 - 0.15 * f * f);
-	input -= uint32_t(out4 * fb);
-	input = uint32_t(input * ftemp);
-//	out1 = input + uint32_t(0.3 * in1) + uint32_t((1 - f) * out1); // Pole 1
-	out1 = input + (19661*in1 + ((65536 - fuint) * out1)) >> bit_shift;
-	in1  = input;
-//	out2 = out1 + uint32_t(0.3 * in2) + uint32_t((1 - f) * out2);  // Pole 2
-	out2 = out1 + (19661*in2 + ((65536 - fuint) * out2)) >> bit_shift;
-	in2  = out1;
-//	out3 = out2 + uint32_t(0.3 * in3) + uint32_t((1 - f) * out3);  // Pole 3
-	out3 = out2 + (19661*in3 + ((65536 - fuint) * out3)) >> bit_shift;
-	in3  = out2;
-//	return out3;
-//	out4 = out3 + uint32_t(0.3 * in4) + uint32_t((1 - f) * out4);  // Pole 4
-	out4 = out3 + (19661*in4 + ((65536 - fuint) * out4)) >> bit_shift;
-	in4  = out3;
-	return out4;
-}
-
-
-
-
-/////////////////////////////////////////////////////////
-//
-//	AUDIO INTERRUPT SERVICE ROUTINE
-//
-/////////////////////////////////////////////////////////
-
-
-void MMusic::synthInterrupt() {
-
-	accumulator1 = accumulator1 + period1;
-	//sample = uint32_t(65536.0*filter(accumulator1/65536.0));
-	sample = uint_filter(accumulator1);
-	//sample = accumulator1;
-	
-	// Formatting the samples to be transfered to the MCP4921 DAC to output A
-	dacSPIA0 = sample >> 8;
-	dacSPIA0 >>= 4;
-	dacSPIA0 |= dacSetA; 
-	dacSPIA1 = sample >> 4;
-	
-	digitalWrite(DAC_CS, LOW);
-	while(SPI.transfer(dacSPIA0));
-	while(SPI.transfer(dacSPIA1));
-	digitalWrite(DAC_CS, HIGH);
-}
-
-
 
 
 
@@ -871,12 +740,6 @@ void MMusic::envelope2() {
 }
 
 
-void MMusic::monotronFilter() {
-	uint32_t cutoffValue = env2 >> 6;
-	analogWrite(CUTOFF_PIN, cutoffValue);
-}
-
-
 void MMusic::amplifier() {
 	
 	sample = (env1 * sample) >> 16;
@@ -906,6 +769,33 @@ void MMusic::sendSampleToDAC() {
 
 }
 
+
+void MMusic::sendToDAC() {
+	
+	// Formatting the samples to be transfered to the MCP4822 DAC to output A
+	dacSPIA0 = sample >> 8;
+	dacSPIA0 >>= 4;
+	dacSPIA0 |= dacSetA; 
+	dacSPIA1 = sample >> 4;
+	
+	digitalWrite(DAC_CS, LOW);
+	while(SPI.transfer(dacSPIA0));
+	while(SPI.transfer(dacSPIA1));
+	digitalWrite(DAC_CS, HIGH);
+
+	// Formatting the samples to be transfered to the MCP4822 DAC to output B
+	dacSPIB0 = cutoff >> 8;
+	dacSPIB0 >>= 4;
+	dacSPIB0 |= dacSetB; 
+	dacSPIB1 = cutoff >> 4;
+	
+	digitalWrite(DAC_CS, LOW);
+	while(SPI.transfer(dacSPIB0));
+	while(SPI.transfer(dacSPIB1));
+	digitalWrite(DAC_CS, HIGH);
+	
+	
+}
 
 
 
@@ -1043,18 +933,9 @@ void MMusic::init()
 	setFMoctaves(0);
 	
 	// filter setup
-	setCutoff(20000.0);
-	setResonance(0.01);
-	
-//	in1 = 0.0;
-//	in2 = 0.0;
-//	in3 = 0.0;
-//	in4 = 0.0;
-//	out1 = 0.0;
-//	out2 = 0.0;
-//	out3 = 0.0;
-//	out4 = 0.0;
-	
+	setCutoff(4095);
+	setResonance(0);
+		
 	// DAC setup
 	dacSetA = 0;
 	dacSetB = 0;
@@ -1064,12 +945,59 @@ void MMusic::init()
 	spi_setup();
 	cli();
 	// set PWM for pin that goes to the monotron's cutoff
-	analogWriteFrequency(CUTOFF_PIN, 44100);
-	analogWriteResolution(10);
+//	analogWriteFrequency(CUTOFF_PIN, 44100);
+//	analogWriteResolution(10);
 	
 	synthTimer.begin(synth_isr, 1000000.0 / sampleRate);
-//	timer_setup();
 	sei();
+	
+}
+
+
+
+
+/////////////////////////////////////
+//
+//	FILTER FUNCTIONS
+//
+/////////////////////////////////////
+
+void MMusic::setCutoff(int32_t c)
+{
+	cutoff = c;
+}
+
+
+void MMusic::setResonance(int32_t res)
+{
+	resonance = res;
+}
+
+
+void MMusic::monotronFilter() {
+	uint32_t cutoffValue = env2 >> 6;
+	analogWrite(CUTOFF_PIN, cutoffValue);
+}
+
+
+void MMusic::filter() {
+	
+	
+//	uint32_t c = (env2 * ((cutoff + 65536) >> 1)) >> 16;
+	int64_t c = ((((env2 * cutoff) >> 15) + 65536) >> 1);
+
+//	uint32_t c = cutoff;
+	
+	// Formatting the samples to be transfered to the MCP4822 DAC to output B
+	dacSPIB0 = uint32_t(c) >> 8;
+	dacSPIB0 >>= 4;
+	dacSPIB0 |= dacSetB; 
+	dacSPIB1 = c >> 4;
+	
+	digitalWrite(DAC_CS, LOW);
+	while(SPI.transfer(dacSPIB0));
+	while(SPI.transfer(dacSPIB1));
+	digitalWrite(DAC_CS, HIGH);	
 	
 }
 
@@ -1088,12 +1016,12 @@ void MMusic::setFrequency(float freq)
 	if(!osc1LFO) setFrequency1(freq);
 	if(!osc2LFO) setFrequency2(freq);
 	if(!osc3LFO) setFrequency3(freq);
-//	period1 = int32_t(((freq * semi1 * (1 + detune1 + bend)) * PERIOD_MAX) / SAMPLE_RATE);
-//	period2 = int32_t(((freq * semi2 * (1 + detune2 + bend)) * PERIOD_MAX) / SAMPLE_RATE);
-//	period3 = int32_t(((freq * semi3 * (1 + detune3 + bend)) * PERIOD_MAX) / SAMPLE_RATE);
-//	frequency1 = freq;
-//	frequency2 = freq;
-//	frequency3 = freq;
+	//	period1 = int32_t(((freq * semi1 * (1 + detune1 + bend)) * PERIOD_MAX) / SAMPLE_RATE);
+	//	period2 = int32_t(((freq * semi2 * (1 + detune2 + bend)) * PERIOD_MAX) / SAMPLE_RATE);
+	//	period3 = int32_t(((freq * semi3 * (1 + detune3 + bend)) * PERIOD_MAX) / SAMPLE_RATE);
+	//	frequency1 = freq;
+	//	frequency2 = freq;
+	//	frequency3 = freq;
 }
 
 
@@ -1807,6 +1735,9 @@ void inline MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 		case PORTAMENTO:
 			Music.setPortamento(portamentoTimeTable[value]);
 			break;
+		case CUTOFF:
+			Music.setCutoff(value * 256);
+			break;			
 		case ZERO_HZ_FM:
 			if(value < 64) Music.fmToZeroHertz(false);
 			else Music.fmToZeroHertz(true);
@@ -1886,9 +1817,6 @@ void inline MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 			break;
 		case GAIN3:
 			Music.setGain3(value / 127.0);
-			break;
-		case WAVEFORM:
-			Music.setWaveform(value / 8);
 			break;
 		case WAVEFORM1:
 			Music.setWaveform1(value / 8);
