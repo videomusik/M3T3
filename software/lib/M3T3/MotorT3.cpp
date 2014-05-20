@@ -52,10 +52,10 @@ MMotor::MMotor(MOTOR m)
 void MMotor::init()
 {   
 	// For best frequencies see http://www.pjrc.com/teensy/td_pulse.html
-	analogWriteFrequency(INPUT_1,93750); // 93750
-	analogWriteFrequency(INPUT_2,93750); // 93759
-	analogWriteFrequency(INPUT_3,93750); // 93750
-	analogWriteFrequency(INPUT_4,93750); // 93759
+	analogWriteFrequency(INPUT_1,23437); // 93750
+	analogWriteFrequency(INPUT_2,23437); // 93750
+	analogWriteFrequency(INPUT_3,23437); // 93750
+	analogWriteFrequency(INPUT_4,23437); // 93750
 	analogWriteResolution(9);
 	pinMode(ENABLE_12, OUTPUT);
 	pinMode(ENABLE_34, OUTPUT);
