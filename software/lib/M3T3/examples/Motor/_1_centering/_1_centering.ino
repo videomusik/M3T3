@@ -1,7 +1,3 @@
-// The Music object is automatically instantiated when the header file is
-// included. Make calls to the Music objects with "Music.function(args)".
-// You still need to call Music.init() in the setup() function below.
-#define MIDI
 #define MIDI_CHANNEL 1
 
 #include <spi4teensy3.h>
@@ -11,13 +7,11 @@
 void setup() {
 
   // We initialise the sound engine by calling Music.init() which outputs a tone
-  Serial.begin(115200);
+  Serial.begin(9600);
   MotorA.init();
   MotorB.init();
   Music.init();
-  Music.enableEnvelope1();
-  Music.enableEnvelope2();
-//  Midi.init();
+  Music.set12bit(true);
   usbMIDI.setHandleNoteOff(OnNoteOff);
   usbMIDI.setHandleNoteOn(OnNoteOn);
   usbMIDI.setHandleControlChange(OnControlChange);
@@ -30,14 +24,34 @@ void loop() {
   usbMIDI.read();
   int valueA = analogRead(A1);
   int valueB = analogRead(A9);
-  int torqueA = (512-valueA)*4;
-  int torqueB = (512-valueB)*4;
+  int centerValue = valueA;
+  int torqueA = (512-valueA);
+  int torqueB = (512-valueB);
 //  Serial.print("valueA = ");
 //  Serial.print(valueA);
 //  Serial.print(" --- valueB = ");
 //  Serial.println(valueB);
 //  delay(50);
-  MotorA.torque(torqueA);
-  MotorB.torque(torqueB);
+  MotorA.torque(torqueA*4);
+  MotorB.torque(torqueB*4);
+  Music.setFrequency(valueA);
+  Music.setDetune(float(torqueB)/1024.0);
   
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// THE BELOW FUNCTIONS ARE NEEDED FOR THE MUSIC PART TO RESPOND TO MIDI
+///////////////////////////////////////////////////////////////////////
+
+void OnNoteOn(byte channel, byte note, byte velocity) {
+  Midi.noteOn(channel, note, velocity);
+}
+
+void OnNoteOff(byte channel, byte note, byte velocity) {
+  Midi.noteOff(channel, note, velocity);
+}
+
+void OnControlChange(byte channel, byte control, byte value) {
+  Midi.controller(channel, control, value);  
 }
