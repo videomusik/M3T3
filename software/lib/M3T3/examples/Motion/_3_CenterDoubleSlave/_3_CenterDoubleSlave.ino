@@ -3,10 +3,9 @@
 //CenterA at xB, CenterB at xA
 //feels like "Slave"
 
-#include <Motor.h>
-#include <Music.h>
-#define BIT_DEPTH 8
-#define NUM_OSCILLATORS 2
+#include <spi4teensy3.h>
+#include <EEPROM.h>
+#include <M3T3.h>
 
 int duty, count, fout;
 int xA, xB, foutA, foutB;
@@ -20,14 +19,16 @@ void setup(){
   Music.setWaveform2(0);
   Music.setGain1(1.0f);
   Music.setGain2(1.0f);
+  
+  analogReadAveraging(32);
 }
 
 void loop(){
    
-  xA = analogRead(A0);
+  xA = analogRead(A1);
   Music.setFrequency1(map (xA, 0, 1023, 40, 2000)); 
   
-  xB = analogRead(A3);
+  xB = analogRead(A9);
   Music.setFrequency2(map (xB, 0, 1023, 40, 2000)); 
   
   foutA = -6*(xA-xB); // this will peak at x=1024/6

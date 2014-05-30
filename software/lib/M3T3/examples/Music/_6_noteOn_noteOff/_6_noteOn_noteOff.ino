@@ -1,25 +1,16 @@
-// You can set the number of oscillators (1 to 3) and the bit depth of the
-// oscillators (8 or 12 bit). These settings must be defined before the
-// inclusion of the MMM library files. They default to 1 osciallator
-// and 8bit respectively.
-
-#define NUM_OSCILLATORS 3
-#define BIT_DEPTH 8
-
-// The Music object is automatically instantiated when the header file is
-// included. Make calls to the Music objects with "Music.function(args)".
-// You still need to call Music.init() in the setup() function below.
-#include <Music.h>
+#include <spi4teensy3.h>
+#include <EEPROM.h>
+#include <M3T3.h>
 
 boolean noteIsOn = false;
 int n = 0;
 int dir = 1;
 int rootNote = 36;
-int note[] = {0,2,3,5,7,9,10,12,14};
+int note[] = {0,12,3,19,15,9,5,24,7};
 
 long time = 0;
 long lastTime = 0;
-long timeDelay = 80;
+long timeDelay = 60;
 
 void setup() {
 
@@ -27,23 +18,23 @@ void setup() {
   Music.init();
   
   // Choosing the square wave oscillator.
-  Music.setWaveform(DIGI3);
+  Music.setWaveform(SAW);
   
   // Detuning the three oscillators slightly to create movement in the sound.
-  Music.setDetune(0.008);  
+  Music.setDetune(0.005);  
     
   // enabling the envelope lets us define an gain envelope for the synth
   // without having to specify it in our loop() or physics code.
-  Music.enableEnvelope();
-  Music.setAttack(8);
-  Music.setDecay(90);
-  Music.setSustain(48);
-  Music.setRelease(64);
+  Music.enableEnvelope1();
+  Music.setEnv1Attack(8);
+  Music.setEnv1Decay(90);
+  Music.setEnv1Sustain(48);
+  Music.setEnv1Release(64);
 
 }
 
 void loop() {
-  
+
   // This short routine loops note over and over again
   time = millis();
   if(time - lastTime > timeDelay) {
@@ -67,4 +58,3 @@ void loop() {
   }
 
 }
-

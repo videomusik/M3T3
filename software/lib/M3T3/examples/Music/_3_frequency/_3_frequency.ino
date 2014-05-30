@@ -1,15 +1,6 @@
-// You can set the number of oscillators (1 to 3) and the bit depth of the
-// oscillators (8 or 12 bit). These settings must be defined before the
-// inclusion of the MMM library files. They default to 1 osciallator
-// and 8bit respectively.
-
-#define NUM_OSCILLATORS 3
-#define BIT_DEPTH 8
-
-// The Music object is automatically instantiated when the header file is
-// included. Make calls to the Music objects with "Music.function(args)".
-// You still need to call Music.init() in the setup() function below.
-#include <Music.h>
+#include <spi4teensy3.h>
+#include <EEPROM.h>
+#include <M3T3.h>
 
 int delayTime = 400;
 int cnt = 0;
@@ -23,7 +14,7 @@ void setup() {
   Music.init();
   Music.setFrequency(220);
   Music.setDetune(0.001); // ranges from 0.00 - 0.02 are usually good
-  Music.setWaveform(SAW);
+  Music.setWaveform(TRIANGLE);
 
 }
 
@@ -39,4 +30,3 @@ void loop() {
     lastTime = timeNow;
   }   
 }
-

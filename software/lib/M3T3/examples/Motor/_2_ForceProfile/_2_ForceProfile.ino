@@ -1,6 +1,10 @@
+//////////////////////////////////
+// THIS SKETCH NEED TO BE FIXED!!
+//////////////////////////////////
 
-#include <Motion.h>
-#include <Motor.h>
+#include <spi4teensy3.h>
+#include <EEPROM.h>
+#include <M3T3.h>
 
 #define NEW '!'
 #define OK '*'

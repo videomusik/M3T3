@@ -1,13 +1,15 @@
 //Pluck: one pluck at x=512
 
+#include <spi4teensy3.h>
+#include <EEPROM.h>
+#include <M3T3.h>
+
 int x, fout, count;
 float f;
 float w = 50; //width of pluck
 float h = 500; //height of pluck
 float slope = h/w;
 boolean forward = true;
-
-#include <Motor.h>
 
 void setup(){
   MotorA.init();
@@ -16,7 +18,7 @@ void setup(){
 }
 
 void loop(){
-  x = analogRead(A0) - 512;
+  x = analogRead(A1) - 512;
   if (forward){
     if (x <= - w/2) f = 0;
     if (x > -w/2 && x< w/2) f = - slope*(x + w/2);

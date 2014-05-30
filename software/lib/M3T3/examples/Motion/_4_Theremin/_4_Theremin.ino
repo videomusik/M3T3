@@ -1,7 +1,10 @@
 // Theremin
 // A: pitch, B: volume
 
-#include <Music.h>
+#include <spi4teensy3.h>
+#include <EEPROM.h>
+#include <M3T3.h>
+
 int xA, xB; //10bit A/D gives 0-1023
 float p; //midi note number 0-127
 double frequency, volume;
@@ -12,7 +15,7 @@ void setup(){
   Serial.begin(9600);
 }
 void loop(){
-  xA = analogRead(A3); // A position
+  xA = analogRead(A1); // A position
   p = float(xA)/8; //pitch (midi)
   
   p = 80.*(p/128.)+20.;
@@ -27,7 +30,7 @@ void loop(){
   frequency = pow(2,((p-69.)/12.))*440; //midi 69 -> 440hz
   Music.setFrequency(frequency);
   
-  xB = analogRead(A0);
+  xB = analogRead(A9);
   volume = -float(xB)/1024.; // B position
   volume = pow(10,volume);
   Music.setGain(volume);
