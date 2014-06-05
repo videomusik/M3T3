@@ -458,6 +458,8 @@ void MMusic::getRandomizedPreset(uint8_t p, uint8_t r)
 }
 
 
+#if defined(USB_MIDI)
+
 void MMusic::sendInstrument()
 {
 //	Serial.print("SENDING PRESET NUMBER : ");
@@ -469,6 +471,12 @@ void MMusic::sendInstrument()
 	}
 	sei();
 }
+
+#else 
+
+void MMusic::sendInstrument(){;}
+
+#endif
 
 
 void MMusic::savePreset(uint8_t p)
