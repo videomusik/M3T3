@@ -62,7 +62,7 @@
 #define LOWPASS 0
 #define HIGHPASS 1
 #define BANDPASS 2
-#define NOTCH 3
+#define THRU 3
 
 // SPI pins
 #define MCP4251_CS 9 // Digital 9
@@ -122,6 +122,11 @@
 // parameters for presets || the two parameters below should multiply to 2048.
 #define MAX_PRESETS 16
 #define PRESET_SIZE 128
+
+#define BANK_U 0
+#define BANK_A 16
+#define BANK_B 32
+#define BANK_C 48
 
 //synth functions and parameters as MIDI controller numbers
 #define PRESET_SAVE 0
@@ -241,7 +246,9 @@ public:
 	
 	// FILTER FUNCTIONS
 	void filter();
-	void setCutoff(int32_t c);
+	void lowpassFilter();
+	void highpassFilter();
+	void setCutoff(uint16_t c);
 	void setResonance(uint8_t res);
 //	void setResonance(int32_t res);
     void setFilterType(uint8_t type);
@@ -251,6 +258,10 @@ public:
 	void setResonanceModSource(uint8_t source);
 	void setCutoffModShape(uint8_t shape);
 	void setResonanceModShape(uint8_t shape);
+    
+    bool lowpass;
+    bool highpass;
+
 
 		
 	// FREQUENCY AND DETUNE FUNCTIONS
@@ -408,14 +419,30 @@ private:
 	int32_t gain3;
 	
 	// FILTER VARIABLES
-	int32_t cutoff;
+    
+    int64_t a0;
+    int64_t a1;
+    int64_t b1;
+	uint16_t cutoff;
 	int32_t resonance;
+    
 	int32_t cutoffModAmount;
 	int32_t cutoffModDirection;
 	int32_t *cutoffModSource_ptr;
 	int32_t *resonanceModSource_ptr;
 	int32_t *cutoffModShape_ptr;
 	int32_t *resonanceModShape_ptr;
+
+    
+    int64_t lastSampleOutLP;
+    int64_t lastSampleInLP;
+    int64_t sampleOutLP;
+    int64_t sampleInLP;
+    int64_t lastSampleOutHP;
+    int64_t lastSampleInHP;
+    int64_t sampleOutHP;
+    int64_t sampleInHP;
+
 	
 	// ENVELOPE VARIABLES
 	bool envelopeOn1;
@@ -442,8 +469,9 @@ private:
 	// NOTE VARIABLE
 	uint8_t notePlayed;
 	
-	// final sample that goes to the DAC    
+	// final sample that goes to the DAC
 	int64_t sample;
+    
 	
 	// the two bytes that go to the DAC over SPI for VCF and VCA
 	volatile uint8_t dacSPIA0;

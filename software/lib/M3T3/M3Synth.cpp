@@ -54,6 +54,11 @@ const uint8_t programPresets[] = {
 };
 
 
+const uint64_t filterCoefficient[] = {
+#include <filterCoefficientTable.inc>
+};
+
+
 // Used in the functions that set the envelope timing
 const uint32_t envTimeTable[] = {1,5,9,14,19,26,34,42,53,65,79,95,113,134,157,182,211,243,278,317,359,405,456,511,570,633,702,776,854,939,1029,1124,1226,1333,1448,1568,1695,1829,1971,2119,2274,2438,2610,2789,2977,3172,3377,3590,3813,4044,4285,4535,4795,5065,5345,5635,5936,6247,6569,6902,7247,7602,7970,8349,8740,9143,9559,9986,10427,10880,11347,11827,12321,12828,13349,13883,14433,14996,15574,16167,16775,17398,18036,18690,19359,20045,20746,21464,22198,22949,23716,24501,25303,26122,26959,27813,28686,29577,30486,31413,32359,33325,34309,35312,36335,37378,38440,39522,40625,41748,42892,44056,45241,46448,47675,48925,50196,51489,52803,54141,55500,56883,58288,59716,61167,62642,64140,65662};
 
@@ -80,7 +85,8 @@ void synth_isr(void) {
 		
 	Music.amplifier();
 
-//	Music.filter();
+	if(Music.lowpass) Music.lowpassFilter();
+	if(Music.highpass) Music.highpassFilter();
 
 }
 
@@ -632,7 +638,7 @@ void MMusic::init()
 	spi_setup();
 
 	// filter setup
-	setCutoff(4095);
+	setCutoff(127);
 	setResonance(127);
     setFilterType(0);
 	
@@ -660,9 +666,9 @@ void MMusic::init()
 //
 /////////////////////////////////////
 
-void MMusic::setCutoff(int32_t c)
+void MMusic::setCutoff(uint16_t c)
 {
-	cutoff = c;
+    cutoff = c;
 }
 
 
@@ -685,35 +691,71 @@ void MMusic::setCutoffModDirection(int32_t direction) {
 }
 
 
-void MMusic::filter() {
-	
+void MMusic::lowpassFilter() {
 	
 	int64_t mod = (int64_t(cutoffModAmount) * (int64_t(*cutoffModSource_ptr)))>>16;
-	int64_t c = (mod + int64_t(cutoff))>>1;
+	int64_t c = (mod + int64_t(cutoff));
 	if(c > 65535) c = 65535;
 	else if(c < 0) c = 0;
-	c = ((((c * 32768) >> 15) + 65536) >> 1);
-	
-	// Formatting the samples to be transfered to the MCP4822 DAC to output B
-	dacSPIA0 = uint32_t(c) >> 8;
-	dacSPIA0 >>= 4;
-	dacSPIA0 |= dacSetA; 
-	dacSPIA1 = c >> 4;
-	
-	digitalWriteFast(DAC_CS, LOW);
-    spi4teensy3::send(dacSPIA0);
-    spi4teensy3::send(dacSPIA1);
-	digitalWriteFast(DAC_CS, HIGH);
+//	c = ((((c * 32768) >> 15) + 65536) >> 1);
 
-	
-// For later implementation of digital pot for Resonance	
-//	Mcp4251.wiper0_pos(resonance);
-//	Mcp4251.wiper1_pos(resonance);
+    b1 = filterCoefficient[c>>9];
+    a0 = BIT_32 - b1;
+    
+    sample = (a0 * sample + b1 * lastSampleInLP) >> 32;
+    lastSampleInLP = sample;
 
 }
 
 
+void MMusic::highpassFilter() {
+    
+    sampleInHP = sample;
+	
+	int64_t mod = (int64_t(cutoffModAmount) * (int64_t(*cutoffModSource_ptr)))>>16;
+	int64_t c = (mod + int64_t(cutoff));
+	if(c > 65535) c = 65535;
+	else if(c < 0) c = 0;
+    //	c = ((((c * 32768) >> 15) + 65536) >> 1);
+    
+    b1 = filterCoefficient[c>>9];
+    a0 = (BIT_32 + b1) >> 1;
+    a1 = -a0;
+    
+    sampleOutHP = (a0 * sampleInHP + a1 * lastSampleInHP + b1 * lastSampleOutHP) >> 32;
+
+    lastSampleInHP = sampleInHP;
+    lastSampleOutHP = sampleOutHP;
+    sample = sampleOutHP;
+    
+}
+
+
+
 void MMusic::setFilterType(uint8_t type) {
+    
+    if(type < 4) {
+        switch (type) {
+            case LOWPASS:
+                lowpass = true;
+                highpass = false;
+                break;
+            case HIGHPASS:
+                lowpass = false;
+                highpass = true;
+                break;
+            case BANDPASS:
+                lowpass = true;
+                highpass = true;
+                break;
+            case THRU:
+                lowpass = false;
+                highpass = false;
+                break;
+            default:
+                break;
+        }
+    }
 /*
     if(type == LOWPASS) {
         digitalWrite(MUX_B, LOW);

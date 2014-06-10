@@ -1,39 +1,29 @@
-Partlist exported from /Users/videomusik/Dropbox/Physical Computing/Eagle/Teensy3 based M&M board/Teensy3 based M&M board V4.sch at 11/11/13 5:47 PM
-
-Part     Value                Device               Package              Description                                                  MF                   MPN OC_FARNELL OC_NEWARK
-AUDIO    PG203J               PG203J               PG203J               MIC/HEADPHONE JACK                                                                                        
-C1       100n                 C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                                                                
-C2       100n                 C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                                                                
-C3       2u2                  CPOL-EUE2-5          E2-5                 POLARIZED CAPACITOR, European symbol                                                                      
-C4       10uF                 CPOL-EUE2-5          E2-5                 POLARIZED CAPACITOR, European symbol                                                                      
-C5       33n                  C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                                                                
-C6       330u                 CPOL-EUE2.5-7        E2,5-7               POLARIZED CAPACITOR, European symbol                                                                      
-C7       47n                  C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                                                                
-C8       10uF                 CPOL-EUE2-5          E2-5                 POLARIZED CAPACITOR, European symbol                                                                      
-C9       100n                 C-EU050-030X075      C050-030X075         CAPACITOR, European symbol                                                                                
-D1       1N4004               1N4004               DO41-10              DIODE                                                                                                     
-D3       1N4148DO35-7         1N4148DO35-7         DO35-7               DIODE                                                                                                     
-IC1      MCP4921              MCP4921P             DIL8                 MCP4921: 12-bit DAC                                                                                       
-IC2      SN754410PDIP         SN754410PDIP         DIL16                                                                                                                          
-IC3      7805TV               7805TV               TO220V               Positive VOLTAGE REGULATOR                                                                                
-J1       DCJ0202              DCJ0202              DCJ0202              DC POWER JACK                                                                         unknown    unknown  
-LED1     TLLR4400             TLLR4400             LED3MM               Low Current (2mA) LED 3 mm Tinted Diffused Package color RED VISHAY SEMICONDUCTOR     1612437             
-MCT62H-1 ILD2                 ILD2                 DIL08                SIEMENS OPTO COUPLER                                                                  1469596    unknown  
-MCT62H-2 ILD2                 ILD2                 DIL08                SIEMENS OPTO COUPLER                                                                  1469596    unknown  
-MCT62H-3 ILD2                 ILD2                 DIL08                SIEMENS OPTO COUPLER                                                                  1469596    unknown  
-R1                            TRIM_EU-CA9V         CA9V                 POTENTIOMETER                                                                                             
-R2       330K                 R-EU_0207/10         0207/10              RESISTOR, European symbol                                                                                 
-R3       10K                  R-EU_0207/10         0207/10              RESISTOR, European symbol                                                                                 
-R4       10                   R-EU_0207/10         0207/10              RESISTOR, European symbol                                                                                 
-R5       100                  R-EU_0207/10         0207/10              RESISTOR, European symbol                                                                                 
-RN1      100                  RN08                 RN-9                 RESISTOR NETWORK                                                                      unknown    unknown  
-RN2      1000                 RN08                 RN-9                 RESISTOR NETWORK                                                                      unknown    unknown  
-S1                            EG1218               GF-126-0159                                                                                                                    
-SJ1                           SJ                   SJ                   SMD solder JUMPER                                                                                         
-SJ2                           SJ                   SJ                   SMD solder JUMPER                                                                                         
-SV1                           ML6                  ML6                  HARTING                                                                               unknown    unknown  
-SV2                           ML6                  ML6                  HARTING                                                                               unknown    unknown  
-U$2      LM386                LM386OA              LM386                                                                                                                          
-U$3      TEENSY_3.0_BAREBONES TEENSY_3.0_BAREBONES TEENSY_3.0_BAREBONES                                                                                                           
-X1       TSW-114-02-S-S       TSW-114-02-S-S       TSW-114-02-S-S       THROUGH-HOLE .025" SQ POST HEADER                                                     unknown    unknown  
-X2       TSW-114-02-S-S       TSW-114-02-S-S       TSW-114-02-S-S       THROUGH-HOLE .025" SQ POST HEADER                                                     unknown    unknown  
+"Qty";"Value";"Device";"Package";"Parts";"Description";"MF";"MPN";"OC_FARNELL";"OC_NEWARK";
+"1";"";"EG1218";"GF-126-0159";"S1";"";"";"";"";"";
+"2";"";"ML6";"ML6";"SV1, SV2";"HARTING";"";"";"unknown";"unknown";
+"2";"";"SJ";"SJ";"SJ1, SJ2";"SMD solder JUMPER";"";"";"";"";
+"1";"";"TRIM_EU-CA9V";"CA9V";"R1";"POTENTIOMETER";"";"";"";"";
+"1";"10";"R-EU_0207/10";"0207/10";"R4";"RESISTOR, European symbol";"";"";"";"";
+"1";"100";"R-EU_0207/10";"0207/10";"R5";"RESISTOR, European symbol";"";"";"";"";
+"1";"100";"RN08";"RN-9";"RN1";"RESISTOR NETWORK";"";"";"unknown";"unknown";
+"1";"1000";"RN08";"RN-9";"RN2";"RESISTOR NETWORK";"";"";"unknown";"unknown";
+"3";"100n";"C-EU050-030X075";"C050-030X075";"C1, C2, C9";"CAPACITOR, European symbol";"";"";"";"";
+"1";"10K";"R-EU_0207/10";"0207/10";"R3";"RESISTOR, European symbol";"";"";"";"";
+"2";"10uF";"CPOL-EUE2-5";"E2-5";"C4, C8";"POLARIZED CAPACITOR, European symbol";"";"";"";"";
+"1";"1N4004";"1N4004";"DO41-10";"D1";"DIODE";"";"";"";"";
+"1";"1N4148DO35-7";"1N4148DO35-7";"DO35-7";"D3";"DIODE";"";"";"";"";
+"1";"2u2";"CPOL-EUE2-5";"E2-5";"C3";"POLARIZED CAPACITOR, European symbol";"";"";"";"";
+"1";"330K";"R-EU_0207/10";"0207/10";"R2";"RESISTOR, European symbol";"";"";"";"";
+"1";"330u";"CPOL-EUE2.5-7";"E2,5-7";"C6";"POLARIZED CAPACITOR, European symbol";"";"";"";"";
+"1";"33n";"C-EU050-030X075";"C050-030X075";"C5";"CAPACITOR, European symbol";"";"";"";"";
+"1";"47n";"C-EU050-030X075";"C050-030X075";"C7";"CAPACITOR, European symbol";"";"";"";"";
+"1";"7805TV";"7805TV";"TO220V";"IC3";"Positive VOLTAGE REGULATOR";"";"";"";"";
+"1";"DCJ0202";"DCJ0202";"DCJ0202";"J1";"DC POWER JACK";"";"";"unknown";"unknown";
+"3";"ILD2";"ILD2";"DIL08";"MCT62H-1, MCT62H-2, MCT62H-3";"SIEMENS OPTO COUPLER";"";"";"1469596";"unknown";
+"1";"LM386";"LM386OA";"LM386";"U$2";"";"";"";"";"";
+"1";"MCP4921";"MCP4921P";"DIL8";"IC1";"MCP4921: 12-bit DAC";"";"";"";"";
+"1";"PG203J";"PG203J";"PG203J";"AUDIO";"MIC/HEADPHONE JACK";"";"";"";"";
+"1";"SN754410PDIP";"SN754410PDIP";"DIL16";"IC2";"";"";"";"";"";
+"1";"TEENSY_3.0_BAREBONES";"TEENSY_3.0_BAREBONES";"TEENSY_3.0_BAREBONES";"U$3";"";"";"";"";"";
+"1";"TLLR4400";"TLLR4400";"LED3MM";"LED1";"Low Current (2mA) LED 3 mm Tinted Diffused Package color RED";"VISHAY SEMICONDUCTOR";"";"1612437";"";
+"2";"TSW-114-02-S-S";"TSW-114-02-S-S";"TSW-114-02-S-S";"X1, X2";"THROUGH-HOLE .025" SQ POST HEADER";"";"";"unknown";"unknown";
