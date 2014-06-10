@@ -42,15 +42,7 @@ enum SENSOR_INPUT {
     INPUTA6 = 0x0110,
     INPUTA7 = 0x0111,
     INPUTA8 = 0x1000,
-<<<<<<< HEAD
-<<<<<<< HEAD
     INPUTA9 = 0x1001
-=======
-    INPUTA9 = 0x1001    
->>>>>>> FETCH_HEAD
-=======
-    INPUTA9 = 0x1001    
->>>>>>> FETCH_HEAD
 };
 
 
