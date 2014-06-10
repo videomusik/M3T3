@@ -31,13 +31,7 @@ void setup() {
   send.setSize(35, 15);
   send.setColorForeground(color(127,34,255));
   send.setColorBackground(color(50,50,50));
-  
-  print = cp5.addButton("print");
-  print.setPosition(w - 140, 2*h + 2*b + 7);
-  print.setSize(35, 15);
-  print.setColorForeground(color(127,34,255));
-  print.setColorBackground(color(50,50,50));
-      
+        
   size(w + 60, 2*h + 60);
   
   p = new Serial(this, Serial.list()[2], 9600);
@@ -53,6 +47,7 @@ void draw() {
     if(in != null) {
       println(in);
       String[] t = splitTokens(in);
+      fpp.cursor_at_ctrl_point(Integer.parseInt(t[1]) / (800 / fpp.forces.length));
     }
   }
   
@@ -75,56 +70,25 @@ public void send() {
   
   send.setOff();
   
-  p.write(NEW);
-  println("1");
-  while(p.available() <= 0);
-  println("2");
-  char in = p.readChar();
-  println("3");
-  if(in == OK) {
-    println("GO!");
-    int s = 800 / fpp.forces.length;
-    int len = s * (fpp.forces.length - 1);
-    serial_send(len);
-    float dx = 1023.0f / (fpp.forces.length - 1);
-    float ddx = dx / s;
-    for(int i = 0; i < fpp.forces.length-1; i++) {
-      float k = fpp.forces[i];
-      float m = (fpp.forces[i+1] - k) / dx;  
-      for(int j = 0; j < s; j++) {
-        int d = (int)(k + m*j);
-        serial_send(d);
-      }
-    }    
-  }    
-  
-  send.setOn();
-  
-}
-
-public void print() {
-  println("print");
-  print.setOff();
-  p.write(PRINT);  
-  while(p.available() <= 0); // block
-  while(p.available() > 0) {
-  String s = p.readStringUntil('#');
-  if(s != null)
-   println(s); 
-  }
-  send.setOn();
+  int s = 800 / fpp.forces.length;
+  float dx = 1023.0f / (fpp.forces.length - 1);
+  float ddx = dx / s;
+  for(int i = 0; i < fpp.forces.length-1; i++) {
+    float k = fpp.forces[i];
+    float m = (fpp.forces[i+1] - k) / dx;  
+    for(int j = 0; j < s; j++) {
+      int d = (int)(k + m*j);
+      serial_send(d);
+    }
+  }          
+  send.setOn();  
 }
 
 public boolean serial_send(int i) {    
-  p.clear();
   char msb = (char) (i / 256);
   char lsb = (char) (i & 0xff);
   p.write(lsb);
   p.write(msb);
-  println(".");
-  while(p.available() <= 0);
-  println("-");
-  char in = p.readChar();
-  return (in == OK);
+  return true;
 }
 

@@ -40,7 +40,9 @@ enum SENSOR_INPUT {
     INPUTA4 = 0x0100,
     INPUTA5 = 0x0101,
     INPUTA6 = 0x0110,
-    INPUTA7 = 0x0111    
+    INPUTA7 = 0x0111,
+    INPUTA8 = 0x1000,
+    INPUTA9 = 0x1001    
 };
 
 

@@ -44,7 +44,9 @@ void setup() {
   plotB = new ScopePlot("Velocity", w, h, b, h + 4*b, 512, true);
   plotC = new ScopePlotDouble("Position Estimate", w, h, b, 2*h + 6*b, 512, true);
   
-  p = new Serial(this, Serial.list()[0], 9600);
+  println(Serial.list()); 
+  
+  p = new Serial(this, Serial.list()[2], 9600);
   proto = new Protocol(p);
   
   // Controls
@@ -105,7 +107,9 @@ void serialEvent (Serial myPort) {
 
 class SliderCallback implements ControlListener {
   public void controlEvent(ControlEvent ev) {
+    println("w+");
     p.write(new String(ev.controller().name()+ev.controller().value()+";"));
+    println("..");
     //println(ev.controller().name() + ": " + ev.controller().value());    
   }
 }
