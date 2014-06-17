@@ -343,6 +343,9 @@ public:
 	bool osc1LFO;
 	bool osc2LFO;
 	bool osc3LFO;
+    
+    int64_t sample;
+
 	
 private:
 	// TIMER VARIABLES
@@ -470,7 +473,7 @@ private:
 	uint8_t notePlayed;
 	
 	// final sample that goes to the DAC
-	int64_t sample;
+//	int64_t sample;
     
 	
 	// the two bytes that go to the DAC over SPI for VCF and VCA
