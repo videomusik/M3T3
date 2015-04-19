@@ -25,8 +25,6 @@
 
 IntervalTimer synthTimer;
 
-MCP4251 Mcp4251 = MCP4251( MCP4251_CS, 100000.0 ); 
-
 MMusic Music;
 
 MMidi Midi;
@@ -75,7 +73,8 @@ const extern uint32_t portamentoTimeTable[] = {1,5,9,13,17,21,26,30,35,39,44,49,
 
 void synth_isr(void) {
 
-    Music.output2DAC();
+    Music.output2DAC();   // commment out to use T3DAC
+//    Music.output2T3DAC();   // uncomment to use T3DAC
 	
 	Music.envelope1();
 	Music.envelope2();
@@ -523,8 +522,7 @@ void MMusic::loadAllPresets()
 
 void MMusic::init()
 {
-//    pinMode(MUX_A, OUTPUT);
-//    pinMode(MUX_B, OUTPUT);
+//    analogWriteResolution(12);  // uncomment to use T3DAC
 
     Midi.init();
 	
@@ -631,8 +629,6 @@ void MMusic::init()
 	dacSetA |= (DAC_A << DAC_AB) | (0 << DAC_BUF) | (1 << DAC_GA) | (1 << DAC_SHDN);
 	dacSetB |= (DAC_B << DAC_AB) | (0 << DAC_BUF) | (1 << DAC_GA) | (1 << DAC_SHDN);
     
-//    analogWriteResolution(12);
-	
 	loadAllPresets();
 	
 	spi_setup();

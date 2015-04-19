@@ -24,7 +24,6 @@
 
 #include <Arduino.h>
 #include <spi4teensy3.h>
-#include "MCP4251.h"
 #include <EEPROM.h>
 
 #ifndef Synth_h // include guard

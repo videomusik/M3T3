@@ -27,7 +27,6 @@ void loop() {
   if((timeNow-lastTime) > delayTime) {
     cnt = cnt + 1;
     if(cnt>16) cnt = 0;
-    float counter = float(cnt);
     Music.setGain1(1.0/cnt);
     Music.setGain2(1.0/cnt);
     Music.setGain3(1.0/cnt);
