@@ -2,9 +2,9 @@
 This sketch runs with Processing sketch Oscilloscope.pde
 */
 
-#include <Motion.h>
-#include <Motor.h>
-#include <Music.h>
+#include <spi4teensy3.h>
+#include <EEPROM.h>
+#include <M3T3.h>
 
 char buf[16] = "";
 
