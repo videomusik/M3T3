@@ -73,8 +73,8 @@ const extern uint32_t portamentoTimeTable[] = {1,5,9,13,17,21,26,30,35,39,44,49,
 
 void synth_isr(void) {
 
-    Music.output2DAC();   // commment out to use T3DAC
-//    Music.output2T3DAC();   // uncomment to use T3DAC
+ //   Music.output2DAC();   // commment out to use T3DAC
+    Music.output2T3DAC();   // uncomment to use T3DAC
 	
 	Music.envelope1();
 	Music.envelope2();
@@ -522,7 +522,7 @@ void MMusic::loadAllPresets()
 
 void MMusic::init()
 {
-//    analogWriteResolution(12);  // uncomment to use T3DAC
+   analogWriteResolution(12);  // uncomment to use T3DAC
 
     Midi.init();
 	
