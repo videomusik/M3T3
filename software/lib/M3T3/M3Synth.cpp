@@ -904,21 +904,21 @@ void MMusic::setFrequency(float freq)
 }
 
 
-void inline MMusic::setFrequency1(float freq)
+void MMusic::setFrequency1(float freq)
 {
 	frequency1 = freq;
 	period1 = int32_t(((frequency1 * semi1 * (1 + detune1 + bend)) * PERIOD_MAX) / SAMPLE_RATE);
 }
 
 
-void inline MMusic::setFrequency2(float freq)
+void MMusic::setFrequency2(float freq)
 {
 	frequency2 = freq;
 	period2 = int32_t(((frequency2 * semi2 * (1 + detune2 + bend)) * PERIOD_MAX) / SAMPLE_RATE);
 }
 
 
-void inline MMusic::setFrequency3(float freq)
+void MMusic::setFrequency3(float freq)
 {
 	frequency3 = freq;
 	period3 = int32_t(((frequency3 * semi3 * (1 + detune3 + bend)) * PERIOD_MAX) / SAMPLE_RATE);
