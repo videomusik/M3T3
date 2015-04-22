@@ -102,12 +102,12 @@
 #define MIDI_SERIAL Serial1
 #define MIDI_THROUGH true
 
-//#ifndef MIDI_CHANNEL
-//	#define MIDI_CHANNEL 2
-//#elif (MIDI_CHANNEL > 0)&&(MIDI_CHANNEL < 17)
-//#else
-//	#error MIDI_CHANNEL should be between 1 - 16
-//#endif
+#ifndef MIDI_CHANNEL
+	#define MIDI_CHANNEL 1
+#elif (MIDI_CHANNEL > 0)&&(MIDI_CHANNEL < 17)
+#else
+	#error MIDI_CHANNEL should be between 1 - 16
+#endif
 
 // parameters for modulation
 #define MOD_FULL 0
@@ -127,6 +127,12 @@
 #define BANK_B 32
 #define BANK_C 48
 
+// Constants defined for MIDI CLOCK
+#define MIDI_CLOCK 0xF8     // 248
+#define MIDI_START 0xFA     // 250;
+#define MIDI_CONTINUE 0xFB  // 251;
+#define MIDI_STOP 0xFC      // 252;
+
 //synth functions and parameters as MIDI controller numbers
 #define PRESET_SAVE 0
 #define PRESET_RECALL 1
@@ -135,7 +141,7 @@
 #define CUTOFF 4
 #define ZERO_HZ_FM 5
 #define FM_OCTAVES 6
-#define RESONANCE 7
+#define RESONANCE_DECLARED_TWICE 7
 #define PORTAMENTO 8
 #define FILTER_TYPE 9
 
@@ -172,6 +178,10 @@
 #define FM3_SHAPE 38
 #define FREQUENCY3 39
 
+#define SONG_PART 40
+#define SONG_KEY 41     // essentially offset of MIDI note number
+#define SONG_SCALE 42   // minor, major, etc
+
 #define CUTOFF_MOD_AMOUNT 70
 #define CUTOFF_MOD_DIRECTION 71
 #define CUTOFF_SOURCE 72
@@ -180,16 +190,36 @@
 #define RESONANCE_MOD_DIRECTION 75
 #define RESONANCE_SOURCE 76
 #define RESONANCE_SHAPE 77
+#define CUTOFF_FREQUENCY 78
+#define RESONANCE 79
 
-#define SEQ_WRITE_POSITION 80
-#define SEQ_WRITE_VALUE 81
-#define SEQ_START 82
-#define SEQ_STOP 83
-#define SEQ_PAUSE 84
-#define SEQ_JUMP_POSITION 85
-#define SEQ_BPM 86
-#define SEQ_SYNC 87
-#define SEQ_ON 88
+#define SEQ_INTERNAL_CLOCK 80
+#define SEQ_CLOCK_IN 81
+#define SEQ_CLOCK_THRU 82
+#define SEQ_CLOCK_OUT 83
+#define SEQ_BPM 84
+#define SEQ_SEQUENCE 85
+#define SEQ_TYPE 86 // note, vel, controller, value
+#define SEQ_INDEX 87
+#define SEQ_VALUE 88
+#define SEQ_INTERNAL 88
+#define SEQ_EXTERNAL 89
+#define SEQ_STEPS 90
+#define SEQ_BEGIN 91
+#define SEQ_END 92
+#define SEQ_SUBDIV 93
+#define SEQ_LOOP 94 // NO_LOOP, LOOP [, PINGPONG, BACKWARDS, STEP]
+#define SEQ_REVERSE 95
+#define SEQ_START 96
+#define SEQ_STOP 97
+#define SEQ_CONTINUE 98
+#define SEQ_JUMP_POSITION 99
+
+
+//#define CFO_COMMAND 90
+//#define CFO_LIGHT_LED 91
+//#define SEQ_STEP_FORWARD 0
+
 
 #define ENV0_VELOCITY 102
 #define ENV0_ENABLE 103
@@ -231,16 +261,20 @@ public:
 	void sendInstrument();
 	void loadAllPresets();
 
-	// AUDIO INTERRUPT SERVICE ROUTINE
-	void synthInterrupt8bit();
-	void synthInterrupt8bitFM();
-	void synthInterrupt12bitSine();
-	void synthInterrupt12bitSineFM();
-	void envelope1();
-	void envelope2();
-	void amplifier();
-	void sendToDAC(); // sending both sound and cutoff
-	void output2DAC(); // sending only sound
+    // AUDIO INTERRUPT SERVICE ROUTINE
+    void synthInterrupt8bit();
+    void synthInterrupt8bitFM();
+    void synthInterrupt12bitSine();
+    void synthInterrupt12bitSineFM();
+    void synthInterrupt12bitSawFM();
+    void phaseDistortionOscillator();
+    
+    void envelope1();
+    void envelope2();
+    void envelopeRC();
+    void amplifier();
+    void sendToDAC(); // sending both sound and cutoff
+    void output2DAC(); // sending only sound
     void output2T3DAC();    // sending sample to Teensy3.1 DAC on pin 14
 	
 	// FILTER FUNCTIONS
@@ -495,10 +529,15 @@ class MMidi {
 public:
 	void init();
 	void checkSerialMidi();
+    
     void setChannel(uint8_t channel);
+    uint8_t getChannel();
+    uint8_t midiChannel;
 	
 	void midiHandler();
-	void noteOff(uint8_t channel, uint8_t note, uint8_t vel);
+    void midiRealTimeHandler(uint8_t data);
+
+    void noteOff(uint8_t channel, uint8_t note, uint8_t vel);
 	void noteOn(uint8_t channel, uint8_t note, uint8_t vel);
 	void aftertouch(uint8_t channel, uint8_t note, uint8_t pressure);
 	void controller(uint8_t channel, uint8_t number, uint8_t value);
@@ -506,8 +545,39 @@ public:
 	void channelPressure(uint8_t channel, uint8_t pressure);
 	void pitchWheel(uint8_t channel, uint8_t highBits, uint8_t lowBits);
 	void pitchChange(uint8_t channel, int pitch); // extra pitchWheel function for USB MIDI interfacing
+    void clock();
+    void stop();
+    void start();
+    void continues();
 
-	uint8_t midiChannel;
+    void sendNoteOff(uint8_t channel, uint8_t note);
+    void sendNoteOff(uint8_t channel, uint8_t note, uint8_t vel);
+    void sendNoteOn(uint8_t channel, uint8_t note, uint8_t vel);
+    void sendController(uint8_t channel, uint8_t number, uint8_t value);
+
+    void sendClock();
+    void sendStart();
+    void sendContinue();
+    void sendStop();
+    
+    void setMidiIn(bool i);
+    bool getMidiIn();
+    
+    void setMidiOut(bool o);
+    bool getMidiOut();
+    
+    void setMidiThru(bool t);
+    bool getMidiThru();
+    
+    void setMidiClockIn(bool i);
+    bool getMidiClockIn();
+    
+    void setMidiClockOut(bool o);
+    bool getMidiClockOut();
+    
+    void setMidiClockThru(bool t);
+    bool getMidiClockThru();
+
 
 private:
 	
@@ -515,9 +585,17 @@ private:
 	uint8_t data;
 	uint8_t midiBuffer[3];
 	
+    bool midiIn;
+    bool midiOut;
+    bool midiThru;
+    bool midiClockIn;
+    bool midiClockOut;
+    bool midiClockThru;
+    
 	int midiBufferIndex;
 	uint16_t frequency;
 	uint8_t notePlayed;
+    bool midiRead;
 };
 
 

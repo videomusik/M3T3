@@ -8,12 +8,15 @@ void setup() {
 
   // We initialise the sound engine by calling Music.init() which outputs a tone
   Music.init();
-//  Music.enableEnvelope1();
-//  Music.enableEnvelope2();
 
+// These guys just have to be here...
   usbMIDI.setHandleNoteOff(OnNoteOff);
   usbMIDI.setHandleNoteOn(OnNoteOn);
   usbMIDI.setHandleControlChange(OnControlChange);
+  usbMIDI.setHandleRealTimeSystem(RealTimeSystem);
+  
+// Loading a preset from EEPROM  
+  Music.getPreset(19);
 
 }
 
@@ -28,7 +31,7 @@ boolean noteIsOn = false;
 int n = 0;
 int dir = 1;
 int rootNote = 36;
-int note[] = {0,0,0,0,0,0,0,0,0};
+int note[] = {0,0,7,0,0,12,0,0,3};
 //int note[] = {0,12,3,19,15,9,5,24,7};
 
 long time = 0;

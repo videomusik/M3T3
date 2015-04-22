@@ -15,7 +15,7 @@ void setup() {
   usbMIDI.setHandleNoteOn(OnNoteOn);
   usbMIDI.setHandleControlChange(OnControlChange);
   
-  Music.getPreset(0);
+  Music.getPreset(16);
 
 }
 

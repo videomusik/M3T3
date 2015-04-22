@@ -25,27 +25,71 @@
 #define M3T3_h
 
 #include <Arduino.h>
-//#include <SPI.h>
 #include <spi4teensy3.h>
+#include "Sequencer.h"
 #include "M3Synth.h"
 #include "MotionT3.h"
 #include "MotorT3.h"
-//#include "Midi.h"
 
 ///////////////////////////////////////////////////////////////////////
 // THE BELOW FUNCTIONS ARE NEEDED FOR THE MUSIC PART TO RESPOND TO MIDI
 ///////////////////////////////////////////////////////////////////////
 
 void OnNoteOn(byte channel, byte note, byte velocity) {
-    Midi.noteOn(channel, note, velocity);
+    if(channel == MIDI_CHANNEL) {
+        Midi.noteOn(channel, note, velocity);
+    }
+    channel = channel - 1;
+    MIDI_SERIAL.write(byte(0x90 | (channel & 0x0F)));
+    MIDI_SERIAL.write(byte(0x7F & note));
+    MIDI_SERIAL.write(byte(0x7F & velocity));
+    //    Serial.write("sent MIDI noteOn on MIDI OUT????");
 }
 
 void OnNoteOff(byte channel, byte note, byte velocity) {
-    Midi.noteOff(channel, note, velocity);
+    if(channel == MIDI_CHANNEL) {
+        Midi.noteOff(channel, note, velocity);
+    }
+    channel = channel - 1;
+    MIDI_SERIAL.write(byte(0x80 | (channel & 0x0F)));
+    MIDI_SERIAL.write(byte(0x7F & note));
+    MIDI_SERIAL.write(byte(0x7F & velocity));
 }
 
 void OnControlChange(byte channel, byte control, byte value) {
-    Midi.controller(channel, control, value);
+    if(channel == MIDI_CHANNEL) {
+        Midi.controller(channel, control, value);
+    }
+    channel = channel - 1;
+    MIDI_SERIAL.write(byte(0xB0 | (channel & 0x0F)));
+    MIDI_SERIAL.write(byte(0x7F & control));
+    MIDI_SERIAL.write(byte(0x7F & value));
+}
+
+void RealTimeSystem(byte realtimebyte) {
+    Midi.midiRealTimeHandler(realtimebyte);
+    /*
+     if(realtimebyte == MIDI_CLOCK) {
+     Midi.clock();
+     Midi.sendClock();
+     //        if(Sequencer.getMidiClock()) MIDI_SERIAL.write(byte(MIDI_CLOCK));
+     }
+     
+     if(realtimebyte == MIDI_START) {
+     Sequencer.midiStart();
+     if(Sequencer.getMidiClock()) MIDI_SERIAL.write(byte(MIDI_START));
+     }
+     
+     if(realtimebyte == MIDI_CONTINUE) {
+     Sequencer.midiContinue();
+     if(Sequencer.getMidiClock()) MIDI_SERIAL.write(byte(MIDI_CONTINUE));
+     }
+     
+     if(realtimebyte == MIDI_STOP) {
+     Sequencer.midiStop();
+     if(Sequencer.getMidiClock()) MIDI_SERIAL.write(byte(MIDI_STOP));
+     }
+     */
 }
 
 #endif // close guard M3T3_h

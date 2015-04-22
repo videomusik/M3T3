@@ -56,8 +56,8 @@ void MMotor::init()
 	analogWriteFrequency(INPUT_2,23437); // 93750
 	analogWriteFrequency(INPUT_3,23437); // 93750
 	analogWriteFrequency(INPUT_4,23437); // 93750
-    analogWriteResolution(9);   // Comment out to use T3DAC
-//    analogWriteResolution(12);  // uncomment to use T3DAC
+//    analogWriteResolution(9);   // Comment out to use T3DAC
+    analogWriteResolution(12);  // uncomment to use T3DAC
 	pinMode(ENABLE_12, OUTPUT);
 	pinMode(ENABLE_34, OUTPUT);
 	_d = FORWARD;
@@ -76,16 +76,16 @@ void MMotor::torque(int t)
 	}
 	t = abs(t);
     if(t > 512) t = 512;
-    _t = t;         // Comment out to use T3DAC
-//    _t = t << 3;    // uncomment to use T3DAC
+//    _t = t;         // Comment out to use T3DAC
+    _t = t << 3;    // uncomment to use T3DAC
 	direction(_d);
 }
 
 
 int MMotor::torque()
 {
-    return _t;         // Comment out to use T3DAC
-//    return _t >> 3;    // uncomment to use T3DAC
+//    return _t;         // Comment out to use T3DAC
+    return _t >> 3;    // uncomment to use T3DAC
 }
 
 
