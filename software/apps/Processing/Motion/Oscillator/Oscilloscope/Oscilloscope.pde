@@ -37,7 +37,8 @@ import processing.serial.*;
 void setup() {
   
   int b = 15;
-  int h = 300;//(displayHeight / 4) - (3*b);
+  //int h = 300;//
+  int h = (displayHeight / 4) - (3*b);
   int w = displayWidth / 2;
   
   plotA = new ScopePlot("Force", w, h, b, b + b, 512, true);

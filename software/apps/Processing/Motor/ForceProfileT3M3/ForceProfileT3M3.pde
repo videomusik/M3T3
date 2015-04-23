@@ -34,7 +34,12 @@ void setup() {
         
   size(w + 60, 2*h + 60);
   
-  p = new Serial(this, Serial.list()[2], 9600);
+  p = new Serial(this, Serial.list()[5], 9600);
+
+  println("serial");
+  for(int i = 0; i < Serial.list().length; i++) {
+    println(Serial.list()[i]);
+  }
   
 }
 
